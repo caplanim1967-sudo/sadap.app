@@ -1,0 +1,12 @@
+{
+  "name": "סד\"פים",
+  "short_name": "סד\"פים",
+  "dir": "rtl",
+  "lang": "he",
+  "display": "standalone",
+  "background_color": "#f2f2f2",
+  "theme_color": "#263238",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

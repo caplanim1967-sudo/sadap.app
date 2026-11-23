@@ -23,51 +23,56 @@
 <meta property="og:type" content="website">
 <meta name="description" content="קישור אישי לאפליקציית הסד״פים – לפתיחה בטלפון שלך בלבד">
 <style>
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { max-width: 100%; overflow-x: hidden; }
-  body { margin: 0; font-family: Arial, "Segoe UI", sans-serif; background: #f2f2f2; color: #222; overflow-wrap: anywhere; }
-  header { background: #263238; color: #fff; padding: 10px 12px; padding-top: calc(10px + env(safe-area-inset-top)); display: flex; align-items: center; gap: 8px; position: sticky; top: 0; z-index: 5; }
-  header h1 { font-size: 18px; margin: 0; flex: 1; }
-  header button { background: #455a64; color: #fff; border: 0; border-radius: 8px; padding: 8px 12px; font-size: 15px; }
-  .net { font-size: 12px; padding: 4px 8px; border-radius: 10px; white-space: nowrap; }
-  .net.on { background: #2e7d32; }
-  .net.off { background: #c62828; }
-  .net.wait { background: #ef6c00; }
-  .bar { font-size: 12px; color: #555; padding: 6px 12px; background: #e0e0e0; }
-  .wrap { padding: 12px; }
-  .msg { background: #fff; border-radius: 10px; padding: 18px; text-align: center; font-size: 17px; line-height: 1.6; }
-  .msg ol { text-align: right; padding-right: 22px; margin: 10px 0 0; }
-  .proc { display: block; width: 100%; text-align: right; background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 16px; margin-bottom: 10px; font-size: 18px; font-weight: bold; color: #222; }
-  .proc small { display: block; font-weight: normal; font-size: 13px; color: #777; margin-top: 4px; }
-  .tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; background: #eceff1; position: sticky; top: calc(52px + env(safe-area-inset-top)); z-index: 4; }
-  .tab { flex: 1 1 auto; min-width: 0; border: 0; border-radius: 8px; padding: 8px; font-size: 14px; line-height: 1.2; white-space: normal; text-align: center; background: #cfd8dc; color: #222; }
-  .tab.on { background: #fff; font-weight: bold; box-shadow: 0 0 0 2px #263238 inset; }
-  .task { background: #fff; border-radius: 10px; padding: 12px; margin-bottom: 10px; border-right: 6px solid #ccc; }
-  .task .t { font-size: 16px; line-height: 1.45; margin-bottom: 8px; }
-  .task .n { color: #777; font-weight: bold; margin-left: 6px; }
-  .task .tm { color: #777; font-size: 13px; margin-bottom: 8px; }
-  .task .pend { color: #ef6c00; font-size: 13px; margin-bottom: 8px; }
-  .btns { display: flex; gap: 6px; }
-  .btns button { flex: 1; min-width: 0; border: 2px solid transparent; border-radius: 8px; padding: 11px 4px; font-size: 15px; color: #fff; opacity: .4; }
-  .btns button.cur { opacity: 1; border-color: #000; font-weight: bold; }
-  .toast { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom)); right: 12px; left: 12px; background: #333; color: #fff; padding: 12px; border-radius: 10px; font-size: 15px; display: none; z-index: 20; text-align: center; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { max-width: 100%; overflow-x: hidden; }
+body { margin: 0; font-family: Arial, "Segoe UI", sans-serif; background: #f2f2f2; color: #222; overflow-wrap: anywhere; }
+header { background: #263238; color: #fff; padding: 10px 12px; padding-top: calc(10px + env(safe-area-inset-top)); display: flex; align-items: center; gap: 8px; position: sticky; top: 0; z-index: 5; }
+header h1 { font-size: 18px; margin: 0; flex: 1; }
+header button { background: #455a64; color: #fff; border: 0; border-radius: 8px; padding: 8px 12px; font-size: 15px; }
+.net { font-size: 12px; padding: 4px 8px; border-radius: 10px; white-space: nowrap; }
+.net.on { background: #2e7d32; }
+.net.off { background: #c62828; }
+.net.wait { background: #ef6c00; }
+.bar { font-size: 12px; color: #555; padding: 6px 12px; background: #e0e0e0; }
+.wrap { padding: 12px; padding-bottom: 90px; }
+.msg { background: #fff; border-radius: 10px; padding: 18px; text-align: center; font-size: 17px; line-height: 1.6; }
+.msg ol { text-align: right; padding-right: 22px; margin: 10px 0 0; }
+.proc { display: block; width: 100%; text-align: right; background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 16px; margin-bottom: 10px; font-size: 18px; font-weight: bold; color: #222; }
+.proc small { display: block; font-weight: normal; font-size: 13px; color: #777; margin-top: 4px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; background: #eceff1; position: sticky; top: calc(52px + env(safe-area-inset-top)); z-index: 4; }
+.tab { flex: 1 1 auto; min-width: 0; border: 0; border-radius: 8px; padding: 8px; font-size: 14px; line-height: 1.2; white-space: normal; text-align: center; background: #cfd8dc; color: #222; }
+.tab.on { background: #fff; font-weight: bold; box-shadow: 0 0 0 2px #263238 inset; }
+.task { background: #fff; border-radius: 10px; padding: 12px; margin-bottom: 10px; border-right: 6px solid #ccc; }
+.task .t { font-size: 16px; line-height: 1.45; margin-bottom: 8px; }
+.task .n { color: #777; font-weight: bold; margin-left: 6px; }
+.task .tm { color: #777; font-size: 13px; margin-bottom: 8px; }
+.task .pend { color: #ef6c00; font-size: 13px; margin-bottom: 8px; }
+.btns { display: flex; gap: 6px; }
+.btns button { flex: 1; min-width: 0; border: 2px solid transparent; border-radius: 8px; padding: 11px 4px; font-size: 15px; color: #fff; opacity: .4; }
+.btns button.cur { opacity: 1; border-color: #000; font-weight: bold; }
+.toast { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom)); right: 12px; left: 12px; background: #333; color: #fff; padding: 12px; border-radius: 10px; font-size: 15px; display: none; z-index: 20; text-align: center; }
+.undo { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom)); right: 12px; left: 12px; background: #263238; color: #fff; padding: 10px 12px; border-radius: 10px; font-size: 15px; display: none; z-index: 21; align-items: center; gap: 10px; }
+.undo span { flex: 1; }
+.undo button { background: #ffca28; color: #3e2723; border: 0; border-radius: 8px; padding: 10px 14px; font-size: 16px; font-weight: bold; white-space: nowrap; }
 </style>
 </head>
 <body>
 <header>
-  <button id="back" style="display:none" onclick="home()">→ חזרה</button>
-  <h1 id="title">סד"פים</h1>
-  <span id="net" class="net"></span>
+<button id="back" style="display:none" onclick="home()">→ חזרה</button>
+<h1 id="title">סד"פים</h1>
+<span id="net" class="net"></span>
 </header>
 <div class="bar" id="bar" style="display:none"></div>
 <div id="tabs"></div>
 <div class="wrap" id="main"><div class="msg">טוען...</div></div>
 <div class="toast" id="toast"></div>
+<div class="undo" id="undo"><span id="undoTxt"></span><button id="undoBtn">↩ ביטול</button></div>
 
 <script>
 var API = 'https://script.google.com/macros/s/AKfycbyb6n3ebgLmMAJ70fs1W7NlmLGa-lBanBnCHmE7APBEIpUML7DsSzaiE4sNIlDbqpE7/exec';
 var K = { key: 'sadap_key', snap: 'sadap_snap', out: 'sadap_outbox', off: 'sadap_offset' };
-var S = { key: null, snap: null, out: [], proc: null, domain: null, syncing: false, offset: 0 };
+var S = { key: null, snap: null, out: [], proc: null, domain: null, syncing: false, offset: 0, undo: null };
+var UNDO_SECONDS = 10;
 
 function $(id) { return document.getElementById(id); }
 function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -78,172 +83,232 @@ function toast(t) { var el = $('toast'); el.innerHTML = t; el.style.display = 'b
 function hhmm(ms) { var d = new Date(ms); return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2); }
 function saveOut() { put(K.out, JSON.stringify(S.out)); }
 function saveSnap() { put(K.snap, JSON.stringify(S.snap)); }
+// ביטול + "סומן ע"י" פעילים רק בסד"פים שהשרת מסמן (כרגע אביר לילה א')
+function feat(proc) { return !!(S.snap && S.snap.feat && S.snap.feat.indexOf(proc) !== -1); }
 
 function isIOS() { return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
 function isStandalone() { return window.navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches); }
 
 function api(body) {
-  return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
-    .then(function (r) { return r.json(); });
+return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
+.then(function (r) { return r.json(); });
 }
 
 // ---------- מצב חיבור ----------
 function netUI() {
-  var el = $('net');
-  var n = S.out.length;
-  if (!navigator.onLine) { el.className = 'net off'; el.textContent = 'אין רשת' + (n ? ' · ' + n + ' ממתינים' : ''); }
-  else if (n) { el.className = 'net wait'; el.textContent = n + ' ממתינים לשליחה'; }
-  else { el.className = 'net on'; el.textContent = 'מחובר'; }
-  if (S.snap && S.snap.syncedAt) { $('bar').style.display = 'block'; $('bar').textContent = 'סנכרון אחרון עם המוקד: ' + hhmm(S.snap.syncedAt); }
+var el = $('net');
+var n = S.out.length;
+if (!navigator.onLine) { el.className = 'net off'; el.textContent = 'אין רשת' + (n ? ' · ' + n + ' ממתינים' : ''); }
+else if (n) { el.className = 'net wait'; el.textContent = n + ' ממתינים לשליחה'; }
+else { el.className = 'net on'; el.textContent = 'מחובר'; }
+if (S.snap && S.snap.syncedAt) { $('bar').style.display = 'block'; $('bar').textContent = 'סנכרון אחרון עם המוקד: ' + hhmm(S.snap.syncedAt); }
 }
 
 // ---------- סנכרון ----------
 function sync(quiet) {
-  if (!S.key || S.syncing) return Promise.resolve();
-  if (!navigator.onLine) { netUI(); return Promise.resolve(); }
-  S.syncing = true;
-  var sent = S.out.slice();
-  return api({ action: 'sync', key: S.key, updates: sent }).then(function (r) {
-    S.syncing = false;
-    if (r.noauth) { put(K.key, null); put(K.snap, null); put(K.out, null); S.key = null; msg('אין הרשאה במכשיר הזה.<br>פנה לרבש"ץ לקבלת קישור הפעלה.'); return; }
-    if (!r.ok) { if (!quiet) toast(esc(r.msg || 'שגיאה בסנכרון')); return; }
-    var done = {}, lost = 0;
-    (r.results || []).forEach(function (x) { done[x.id] = true; if (!x.ok) lost++; });
-    S.out = S.out.filter(function (u) { return !done[u.id]; });
-    saveOut();
-    if (lost) toast(lost === 1 ? 'עדכון אחד לא נשמר: המשימה עודכנה מאוחר יותר או שבוצע איפוס במוקד.' : lost + ' עדכונים לא נשמרו: המשימות עודכנו מאוחר יותר או שבוצע איפוס במוקד.');
-    S.offset = r.serverTime - Date.now(); put(K.off, String(S.offset));
-    r.syncedAt = Date.now();
-    delete r.results;
-    S.snap = r; saveSnap();
-    applyOutbox();
-    render();
-  }).catch(function () {
-    S.syncing = false; netUI();
-  });
+if (!S.key || S.syncing) return Promise.resolve();
+if (!navigator.onLine) { netUI(); return Promise.resolve(); }
+S.syncing = true;
+var sent = S.out.slice();
+S.inflight = {}; sent.forEach(function (u) { S.inflight[u.id] = true; });
+var wire = sent.map(function (u) { return { id: u.id, proc: u.proc, domain: u.domain, serial: u.serial, status: u.status, t: u.t, ev: u.ev, undo: u.undo || undefined, from: u.from }; });
+return api({ action: 'sync', key: S.key, updates: wire }).then(function (r) {
+S.syncing = false; S.inflight = {};
+if (r.noauth) { put(K.key, null); put(K.snap, null); put(K.out, null); S.key = null; msg('אין הרשאה במכשיר הזה.<br>פנה לרבש"ץ לקבלת קישור הפעלה.'); return; }
+if (!r.ok) { if (!quiet) toast(esc(r.msg || 'שגיאה בסנכרון')); return; }
+var done = {}, lost = 0, undoLost = 0;
+(r.results || []).forEach(function (x) { done[x.id] = true; if (!x.ok) { if (x.why === 'changed') undoLost++; else lost++; } });
+S.out = S.out.filter(function (u) { return !done[u.id]; });
+saveOut();
+if (undoLost) toast('הביטול לא בוצע: מישהו אחר עדכן את המשימה בינתיים.');
+else if (lost) toast(lost === 1 ? 'עדכון אחד לא נשמר: המשימה עודכנה מאוחר יותר או שבוצע איפוס במוקד.' : lost + ' עדכונים לא נשמרו: המשימות עודכנו מאוחר יותר או שבוצע איפוס במוקד.');
+S.offset = r.serverTime - Date.now(); put(K.off, String(S.offset));
+r.syncedAt = Date.now();
+delete r.results;
+S.snap = r; saveSnap();
+applyOutbox();
+render();
+}).catch(function () {
+S.syncing = false; S.inflight = {}; netUI();
+});
 }
 
 // עדכונים שעוד לא נשלחו מוצגים מעל תמונת המצב שהגיעה מהשרת
 function applyOutbox() {
-  if (!S.snap) return;
-  S.out.forEach(function (u) {
-    var list = S.snap.data[u.proc] && S.snap.data[u.proc][u.domain];
-    if (!list) return;
-    list.forEach(function (t) { if (t.serial === u.serial) { t.status = u.status; t.time = hhmm(u.t); t.pending = true; } });
-  });
+if (!S.snap) return;
+S.out.forEach(function (u) {
+var list = S.snap.data[u.proc] && S.snap.data[u.proc][u.domain];
+if (!list) return;
+list.forEach(function (t) {
+if (t.serial !== u.serial) return;
+t.status = u.status; t.pending = true;
+if (u.undo) { t.time = u.prevTime || ''; t.by = u.prevBy || ''; }
+else { t.time = hhmm(u.t); t.by = S.snap.name || ''; }
+});
+});
+}
+
+function findTask(proc, domain, serial) {
+var list = S.snap.data[proc] && S.snap.data[proc][domain];
+var task = null;
+(list || []).forEach(function (t) { if (t.serial === serial) task = t; });
+return task;
 }
 
 function setStatus(serial, status) {
-  var list = S.snap.data[S.proc][S.domain];
-  var task = null;
-  list.forEach(function (t) { if (t.serial === serial) task = t; });
-  if (!task || task.status === status) return;
-  var t = Date.now() + (S.offset || 0);
-  S.out.push({ id: t + '-' + Math.random().toString(36).slice(2, 8), proc: S.proc, domain: S.domain, serial: serial, status: status, t: t, ev: S.snap.ev });
-  saveOut();
-  task.status = status; task.time = hhmm(t); task.pending = true;
-  saveSnap();
-  render();
-  sync(true);
+var task = findTask(S.proc, S.domain, serial);
+if (!task || task.status === status) return;
+var t = Date.now() + (S.offset || 0);
+var id = t + '-' + Math.random().toString(36).slice(2, 8);
+var before = { status: task.status, time: task.time || '', by: task.by || '', pending: !!task.pending };
+S.out.push({ id: id, proc: S.proc, domain: S.domain, serial: serial, status: status, t: t, ev: S.snap.ev });
+saveOut();
+task.status = status; task.time = hhmm(t); task.by = S.snap.name || ''; task.pending = true;
+saveSnap();
+render();
+if (feat(S.proc)) showUndo({ id: id, proc: S.proc, domain: S.domain, serial: serial, status: status, before: before });
+sync(true);
 }
+
+// ---------- כפתור ביטול ----------
+function showUndo(u) {
+S.undo = u;
+var left = UNDO_SECONDS;
+function draw() { $('undoTxt').textContent = 'משימה ' + u.serial + ' סומנה "' + u.status + '"'; $('undoBtn').textContent = '↩ ביטול (' + left + ')'; }
+draw();
+$('undo').style.display = 'flex';
+clearInterval(showUndo.h);
+showUndo.h = setInterval(function () { left--; if (left <= 0) hideUndo(); else draw(); }, 1000);
+}
+function hideUndo() { clearInterval(showUndo.h); S.undo = null; $('undo').style.display = 'none'; }
+
+function doUndo() {
+var u = S.undo;
+hideUndo();
+if (!u || !S.snap) return;
+var task = findTask(u.proc, u.domain, u.serial);
+if (!task) return;
+if (task.status !== u.status) { toast('הביטול לא בוצע: המשימה כבר עודכנה.'); return; }
+var idx = -1;
+S.out.forEach(function (x, i) { if (x.id === u.id) idx = i; });
+if (idx !== -1 && !(S.syncing && S.inflight && S.inflight[u.id])) {
+// הסימון עוד לא נשלח – פשוט מוחקים אותו מהתור
+S.out.splice(idx, 1);
+saveOut();
+task.status = u.before.status; task.time = u.before.time; task.by = u.before.by; task.pending = u.before.pending;
+} else {
+var t = Date.now() + (S.offset || 0);
+S.out.push({ id: t + '-' + Math.random().toString(36).slice(2, 8), proc: u.proc, domain: u.domain, serial: u.serial,
+status: u.before.status, t: t, ev: S.snap.ev, undo: true, from: u.status, prevTime: u.before.time, prevBy: u.before.by });
+saveOut();
+task.status = u.before.status; task.time = u.before.time; task.by = u.before.by; task.pending = true;
+}
+saveSnap();
+render();
+toast('הסימון בוטל. משימה ' + u.serial + ' חזרה ל"' + esc(u.before.status) + '".');
+sync(true);
+}
+$('undoBtn').onclick = doUndo;
 
 // ---------- תצוגה ----------
 function render() {
-  netUI();
-  if (!S.snap) return;
-  if (!S.proc) return renderHome();
-  renderProc();
+netUI();
+if (!S.snap) return;
+if (!S.proc) return renderHome();
+renderProc();
 }
 
-function home() { S.proc = null; S.domain = null; window.scrollTo(0, 0); render(); }
+function home() { hideUndo(); S.proc = null; S.domain = null; window.scrollTo(0, 0); render(); }
 
 function renderHome() {
-  $('back').style.display = 'none';
-  $('title').textContent = 'סד"פים – ' + S.snap.name;
-  $('tabs').innerHTML = '';
-  var h = '';
-  S.snap.procs.forEach(function (p) {
-    var open = 0, all = 0, data = S.snap.data[p] || {};
-    Object.keys(data).forEach(function (d) { data[d].forEach(function (t) { all++; if (t.status !== S.snap.statuses[S.snap.statuses.length - 1]) open++; }); });
-    var started = false;
-    Object.keys(data).forEach(function (d) { data[d].forEach(function (t) { if (t.status !== S.snap.statuses[0]) started = true; }); });
-    h += '<button class="proc" data-p="' + esc(p) + '">' + esc(p) + (started ? '<small>פעיל · ' + open + ' משימות פתוחות מתוך ' + all + '</small>' : '') + '</button>';
-  });
-  $('main').innerHTML = h || '<div class="msg">אין סד"פים להצגה.</div>';
-  Array.prototype.forEach.call(document.querySelectorAll('.proc'), function (b) {
-    b.onclick = function () { S.proc = b.getAttribute('data-p'); S.domain = null; window.scrollTo(0, 0); render(); };
-  });
+$('back').style.display = 'none';
+$('title').textContent = 'סד"פים – ' + S.snap.name;
+$('tabs').innerHTML = '';
+var h = '';
+S.snap.procs.forEach(function (p) {
+var open = 0, all = 0, data = S.snap.data[p] || {};
+Object.keys(data).forEach(function (d) { data[d].forEach(function (t) { all++; if (t.status !== S.snap.statuses[S.snap.statuses.length - 1]) open++; }); });
+var started = false;
+Object.keys(data).forEach(function (d) { data[d].forEach(function (t) { if (t.status !== S.snap.statuses[0]) started = true; }); });
+h += '<button class="proc" data-p="' + esc(p) + '">' + esc(p) + (started ? '<small>פעיל · ' + open + ' משימות פתוחות מתוך ' + all + '</small>' : '') + '</button>';
+});
+$('main').innerHTML = h || '<div class="msg">אין סד"פים להצגה.</div>';
+Array.prototype.forEach.call(document.querySelectorAll('.proc'), function (b) {
+b.onclick = function () { S.proc = b.getAttribute('data-p'); S.domain = null; window.scrollTo(0, 0); render(); };
+});
 }
 
 function renderProc() {
-  $('back').style.display = 'inline-block';
-  $('title').textContent = S.proc;
-  var data = S.snap.data[S.proc] || {};
-  var doms = S.snap.domains.filter(function (d) { return data[d] && data[d].length; });
-  if (!doms.length) { msg('אין משימות בסד"פ הזה.'); return; }
-  if (!S.domain || doms.indexOf(S.domain) === -1) S.domain = doms[0];
-  var th = '<div class="tabs">';
-  doms.forEach(function (d) { th += '<button class="tab' + (d === S.domain ? ' on' : '') + '" data-d="' + esc(d) + '">' + esc(d) + '</button>'; });
-  $('tabs').innerHTML = th + '</div>';
-  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
-    b.onclick = function () { S.domain = b.getAttribute('data-d'); window.scrollTo(0, 0); render(); };
-  });
-  var colors = S.snap.colors || {};
-  var h = '';
-  data[S.domain].forEach(function (t) {
-    var c = colors[t.status] || '#ccc';
-    h += '<div class="task" style="border-right-color:' + c + '"><div class="t"><span class="n">' + t.serial + '.</span>' + esc(t.text) + '</div>';
-    if (t.pending) h += '<div class="pend">⏳ ממתין לשליחה למוקד (' + esc(t.time) + ')</div>';
-    else if (t.time) h += '<div class="tm">עודכן ' + esc(t.time) + '</div>';
-    h += '<div class="btns">';
-    S.snap.statuses.forEach(function (s) {
-      h += '<button style="background:' + (colors[s] || '#888') + '" class="' + (s === t.status ? 'cur' : '') + '" data-s="' + t.serial + '" data-v="' + esc(s) + '">' + esc(s) + '</button>';
-    });
-    h += '</div></div>';
-  });
-  $('main').innerHTML = h;
-  Array.prototype.forEach.call(document.querySelectorAll('.btns button'), function (b) {
-    b.onclick = function () { setStatus(Number(b.getAttribute('data-s')), b.getAttribute('data-v')); };
-  });
+$('back').style.display = 'inline-block';
+$('title').textContent = S.proc;
+var data = S.snap.data[S.proc] || {};
+var doms = S.snap.domains.filter(function (d) { return data[d] && data[d].length; });
+if (!doms.length) { msg('אין משימות בסד"פ הזה.'); return; }
+if (!S.domain || doms.indexOf(S.domain) === -1) S.domain = doms[0];
+var th = '<div class="tabs">';
+doms.forEach(function (d) { th += '<button class="tab' + (d === S.domain ? ' on' : '') + '" data-d="' + esc(d) + '">' + esc(d) + '</button>'; });
+$('tabs').innerHTML = th + '</div>';
+Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+b.onclick = function () { hideUndo(); S.domain = b.getAttribute('data-d'); window.scrollTo(0, 0); render(); };
+});
+var colors = S.snap.colors || {};
+var showBy = feat(S.proc);
+var h = '';
+data[S.domain].forEach(function (t) {
+var c = colors[t.status] || '#ccc';
+var by = (showBy && t.by) ? ' · ע"י ' + esc(t.by) : '';
+h += '<div class="task" style="border-right-color:' + c + '"><div class="t"><span class="n">' + t.serial + '.</span>' + esc(t.text) + '</div>';
+if (t.pending) h += '<div class="pend">⏳ ממתין לשליחה למוקד' + (t.time ? ' (' + esc(t.time) + ')' : '') + by + '</div>';
+else if (t.time) h += '<div class="tm">עודכן ' + esc(t.time) + by + '</div>';
+h += '<div class="btns">';
+S.snap.statuses.forEach(function (s) {
+h += '<button style="background:' + (colors[s] || '#888') + '" class="' + (s === t.status ? 'cur' : '') + '" data-s="' + t.serial + '" data-v="' + esc(s) + '">' + esc(s) + '</button>';
+});
+h += '</div></div>';
+});
+$('main').innerHTML = h;
+Array.prototype.forEach.call(document.querySelectorAll('.btns button'), function (b) {
+b.onclick = function () { setStatus(Number(b.getAttribute('data-s')), b.getAttribute('data-v')); };
+});
 }
 
 // ---------- הפעלה ----------
 function iosInstallHelp() {
-  msg('<b>כמעט סיימנו – באייפון יש להוסיף קודם למסך הבית:</b>' +
-    '<ol><li>אם הדף פתוח בתוך וואטסאפ – פותחים אותו ב<b>ספארי</b>.</li>' +
-    '<li>לוחצים על כפתור השיתוף (ריבוע עם חץ למעלה).</li>' +
-    '<li>"הוספה למסך הבית" ← "הוסף".</li>' +
-    '<li>פותחים את האפליקציה <b>מהאייקון</b> שנוצר במסך הבית.</li></ol>' +
-    '<br>ההפעלה תתבצע בפתיחה הראשונה מהאייקון.');
+msg('<b>כמעט סיימנו – באייפון יש להוסיף קודם למסך הבית:</b>' +
+'<ol><li>אם הדף פתוח בתוך וואטסאפ – פותחים אותו ב<b>ספארי</b>.</li>' +
+'<li>לוחצים על כפתור השיתוף (ריבוע עם חץ למעלה).</li>' +
+'<li>"הוספה למסך הבית" ← "הוסף".</li>' +
+'<li>פותחים את האפליקציה <b>מהאייקון</b> שנוצר במסך הבית.</li></ol>' +
+'<br>ההפעלה תתבצע בפתיחה הראשונה מהאייקון.');
 }
 
 function activate(code) {
-  if (!navigator.onLine) { msg('להפעלה הראשונה צריך חיבור לרשת.<br>התחבר ופתח שוב את הקישור.'); return; }
-  msg('מפעיל את המכשיר...');
-  api({ action: 'activate', code: code }).then(function (r) {
-    if (!r.ok) { msg(esc(r.msg || 'ההפעלה נכשלה')); return; }
-    S.key = r.key; put(K.key, r.key);
-    history.replaceState(null, '', location.pathname);
-    msg('המכשיר הופעל. טוען סד"פים...');
-    sync();
-  }).catch(function () { msg('אין חיבור כרגע. נסה שוב בעוד רגע.'); });
+if (!navigator.onLine) { msg('להפעלה הראשונה צריך חיבור לרשת.<br>התחבר ופתח שוב את הקישור.'); return; }
+msg('מפעיל את המכשיר...');
+api({ action: 'activate', code: code }).then(function (r) {
+if (!r.ok) { msg(esc(r.msg || 'ההפעלה נכשלה')); return; }
+S.key = r.key; put(K.key, r.key);
+history.replaceState(null, '', location.pathname);
+msg('המכשיר הופעל. טוען סד"פים...');
+sync();
+}).catch(function () { msg('אין חיבור כרגע. נסה שוב בעוד רגע.'); });
 }
 
 function start() {
-  S.key = get(K.key);
-  try { S.out = JSON.parse(get(K.out) || '[]'); } catch (e) { S.out = []; }
-  try { S.snap = JSON.parse(get(K.snap) || 'null'); } catch (e) { S.snap = null; }
-  S.offset = Number(get(K.off)) || 0;
-  var code = new URLSearchParams(location.search).get('act');
-  if (S.key) {
-    if (code) history.replaceState(null, '', location.pathname);
-    if (S.snap) { applyOutbox(); render(); } else msg('טוען סד"פים...');
-    sync();
-    return;
-  }
-  if (!code) { msg('אין הרשאה במכשיר הזה.<br>פנה לרבש"ץ לקבלת קישור הפעלה.'); netUI(); return; }
-  if (isIOS() && !isStandalone()) { iosInstallHelp(); return; }
-  activate(code);
+S.key = get(K.key);
+try { S.out = JSON.parse(get(K.out) || '[]'); } catch (e) { S.out = []; }
+try { S.snap = JSON.parse(get(K.snap) || 'null'); } catch (e) { S.snap = null; }
+S.offset = Number(get(K.off)) || 0;
+var code = new URLSearchParams(location.search).get('act');
+if (S.key) {
+if (code) history.replaceState(null, '', location.pathname);
+if (S.snap) { applyOutbox(); render(); } else msg('טוען סד"פים...');
+sync();
+return;
+}
+if (!code) { msg('אין הרשאה במכשיר הזה.<br>פנה לרבש"ץ לקבלת קישור הפעלה.'); netUI(); return; }
+if (isIOS() && !isStandalone()) { iosInstallHelp(); return; }
+activate(code);
 }
 
 window.addEventListener('online', function () { netUI(); sync(true); });
@@ -252,7 +317,7 @@ document.addEventListener('visibilitychange', function () { if (!document.hidden
 setInterval(function () { if (!document.hidden) sync(true); }, 60000);
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(function () {});
+navigator.serviceWorker.register('sw.js').catch(function () {});
 }
 start();
 </script>

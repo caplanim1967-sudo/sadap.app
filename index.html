@@ -58,6 +58,10 @@ header button { background: #455a64; color: #fff; border: 0; border-radius: 8px;
 .undo { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom)); right: 12px; left: 12px; background: #263238; color: #fff; padding: 10px 12px; border-radius: 10px; font-size: 15px; display: none; z-index: 21; align-items: center; gap: 10px; }
 .undo span { flex: 1; }
 .undo button { background: #ffca28; color: #3e2723; border: 0; border-radius: 8px; padding: 10px 14px; font-size: 16px; font-weight: bold; white-space: nowrap; }
+.sec { font-size: 13px; font-weight: bold; color: #1565c0; margin: 14px 2px 8px; }
+.hit { display: block; width: 100%; text-align: right; background: #e3f2fd; border: 1px solid #bbdefb; border-right: 5px solid #1565c0; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; font-size: 15px; line-height: 1.45; color: #0d2a4a; font-style: italic; }
+.hit .w { display: block; font-style: normal; font-size: 12px; color: #1565c0; font-weight: bold; margin-bottom: 4px; }
+.hit mark { background: #fff59d; padding: 0 1px; }
 </style>
 </head>
 <body>
@@ -225,7 +229,7 @@ renderProc();
 function home() { hideUndo(); S.proc = null; S.domain = null; window.scrollTo(0, 0); render(); }
 
 // חיפוש: כל מילה שהוקלדה צריכה להופיע בשם הסד"פ (בלי תלות בגרשיים)
-function norm(s) { return String(s || '').replace(/["'׳״]/g, '').toLowerCase(); }
+function norm(s) { return String(s || '').replace(/["'׳״]/g, '').replace(/[ךםןףץ]/g, function (c) { return { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' }[c]; }).toLowerCase(); }
 function matchQ(p) {
 var words = norm(S.q).split(/\s+/).filter(Boolean);
 var n = norm(p);
@@ -236,7 +240,7 @@ function renderHome() {
 $('back').style.display = 'none';
 $('title').textContent = 'סד"פים – ' + S.snap.name;
 if ($('q')) { renderList(); return; } // לא בונים מחדש את תיבת החיפוש בזמן הקלדה (סנכרון כל דקה)
-$('tabs').innerHTML = '<div class="search"><input id="q" type="search" placeholder="🔍 חיפוש סד&quot;פ לפי מילה מהשם" autocomplete="off"><button id="qx" aria-label="ניקוי">✕</button></div>';
+$('tabs').innerHTML = '<div class="search"><input id="q" type="search" placeholder="🔍 חיפוש לפי שם סד&quot;פ או תוכן" autocomplete="off"><button id="qx" aria-label="ניקוי">✕</button></div>';
 var q = $('q');
 q.value = S.q || '';
 q.oninput = function () { S.q = q.value; renderList(); };
@@ -254,10 +258,49 @@ var started = false;
 Object.keys(data).forEach(function (d) { data[d].forEach(function (t) { if (t.status !== S.snap.statuses[0]) started = true; }); });
 h += '<button class="proc" data-p="' + esc(p) + '">' + esc(p) + (started ? '<small>פעיל · ' + open + ' משימות פתוחות מתוך ' + all + '</small>' : '') + '</button>';
 });
-$('main').innerHTML = h || '<div class="msg">' + (S.q ? 'לא נמצא סד"פ עם "' + esc(S.q) + '".' : 'אין סד"פים להצגה.') + '</div>';
+var hits = S.q ? contentHits() : [];
+if (S.q && h) h = '<div class="sec">סד"פים</div>' + h;
+if (hits.length) {
+h += '<div class="sec">נמצא בתוכן הסד"פים (' + hits.length + ')</div>';
+hits.forEach(function (x) {
+h += '<button class="hit" data-p="' + esc(x.p) + '" data-d="' + esc(x.d || '') + '" data-s="' + (x.s || '') + '"><span class="w">' + esc(x.p) + ' · ' + esc(x.w) + '</span>' + mark(x.t) + '</button>';
+});
+}
+$('main').innerHTML = h || '<div class="msg">' + (S.q ? 'לא נמצא סד"פ או תוכן עם "' + esc(S.q) + '".' : 'אין סד"פים להצגה.') + '</div>';
 Array.prototype.forEach.call(document.querySelectorAll('.proc'), function (b) {
 b.onclick = function () { S.proc = b.getAttribute('data-p'); S.domain = null; window.scrollTo(0, 0); render(); };
 });
+Array.prototype.forEach.call(document.querySelectorAll('.hit'), function (b) {
+b.onclick = function () { S.proc = b.getAttribute('data-p'); S.domain = b.getAttribute('data-d') || null; S.focus = b.getAttribute('data-s') || null; window.scrollTo(0, 0); render(); };
+});
+}
+
+// חיפוש בתוכן: כותרת הסד"פ (תיאור, עיקרי מאמצים, סמכויות) וכל המשימות
+function contentHits() {
+var words = norm(S.q).split(/\s+/).filter(Boolean);
+if (!words.length) return [];
+function ok(s) { var n = norm(s); return n && words.every(function (w) { return n.indexOf(w) !== -1; }); }
+var out = [], H = S.snap.heads || {};
+S.snap.procs.forEach(function (p) {
+var hd = H[p] || {};
+[['desc', 'תיאור ההכרזה'], ['efforts', 'עיקרי המאמצים'], ['auth', 'סמכויות']].forEach(function (f) { if (ok(hd[f[0]])) out.push({ p: p, w: f[1], t: hd[f[0]] }); });
+var data = S.snap.data[p] || {};
+S.snap.domains.forEach(function (d) {
+(data[d] || []).slice().sort(function (a, b) { return a.serial - b.serial; }).forEach(function (t) {
+if (ok(t.text)) out.push({ p: p, d: d, s: t.serial, w: d + ' · משימה ' + t.serial, t: t.text });
+});
+});
+});
+return out;
+}
+function mark(s) {
+var h = esc(s);
+norm(S.q).split(/\s+/).filter(Boolean).forEach(function (w) {
+var e = esc(w).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+e = e.replace(/[כמנפצ]/g, function (c) { return '[' + c + { 'כ': 'ך', 'מ': 'ם', 'נ': 'ן', 'פ': 'ף', 'צ': 'ץ' }[c] + ']'; });
+try { h = h.replace(new RegExp(e, 'gi'), function (m) { return '<mark>' + m + '</mark>'; }); } catch (x) {}
+});
+return h;
 }
 
 function renderProc() {
@@ -279,7 +322,7 @@ var h = '';
 data[S.domain].forEach(function (t) {
 var c = colors[t.status] || '#ccc';
 var by = (showBy && t.by) ? ' · ע"י ' + esc(t.by) : '';
-h += '<div class="task" style="border-right-color:' + c + '"><div class="t"><span class="n">' + t.serial + '.</span>' + esc(t.text) + '</div>';
+h += '<div class="task" id="tk' + t.serial + '" style="border-right-color:' + c + '"><div class="t"><span class="n">' + t.serial + '.</span>' + esc(t.text) + '</div>';
 if (t.pending) h += '<div class="pend">⏳ ממתין לשליחה למוקד' + (t.time ? ' (' + esc(t.time) + ')' : '') + by + '</div>';
 else if (t.time) h += '<div class="tm">עודכן ' + esc(t.time) + by + '</div>';
 h += '<div class="btns">';
@@ -289,6 +332,7 @@ h += '<button style="background:' + (colors[s] || '#888') + '" class="' + (s ===
 h += '</div></div>';
 });
 $('main').innerHTML = h;
+if (S.focus) { var fe = $('tk' + S.focus); S.focus = null; if (fe) { fe.scrollIntoView({ block: 'center' }); fe.style.boxShadow = '0 0 0 3px #1565c0'; } }
 Array.prototype.forEach.call(document.querySelectorAll('.btns button'), function (b) {
 b.onclick = function () { setStatus(Number(b.getAttribute('data-s')), b.getAttribute('data-v')); };
 });

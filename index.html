@@ -62,6 +62,11 @@ header button { background: #455a64; color: #fff; border: 0; border-radius: 8px;
 .hit { display: block; width: 100%; text-align: right; background: #e3f2fd; border: 1px solid #bbdefb; border-right: 5px solid #1565c0; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; font-size: 15px; line-height: 1.45; color: #0d2a4a; font-style: italic; }
 .hit .w { display: block; font-style: normal; font-size: 12px; color: #1565c0; font-weight: bold; margin-bottom: 4px; }
 .hit mark { background: #fff59d; padding: 0 1px; }
+.info { display: block; width: 100%; text-align: right; background: #eceff1; border: 1px solid #cfd8dc; border-right: 5px solid #607d8b; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; font-size: 17px; font-weight: bold; color: #263238; }
+.irow { background: #fff; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; font-size: 15px; line-height: 1.5; }
+.ic { display: block; }
+.ic + .ic { color: #444; border-top: 1px dashed #e0e0e0; margin-top: 4px; padding-top: 4px; }
+.irow a { color: #1565c0; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -120,7 +125,7 @@ S.syncing = true;
 var sent = S.out.slice();
 S.inflight = {}; sent.forEach(function (u) { S.inflight[u.id] = true; });
 var wire = sent.map(function (u) { return { id: u.id, proc: u.proc, domain: u.domain, serial: u.serial, status: u.status, t: u.t, ev: u.ev, undo: u.undo || undefined, from: u.from }; });
-return api({ action: 'sync', key: S.key, updates: wire }).then(function (r) {
+return api({ action: 'sync', key: S.key, updates: wire, ih: (S.snap && S.snap.info) ? S.snap.ih : '' }).then(function (r) {
 S.syncing = false; S.inflight = {};
 if (r.noauth) { put(K.key, null); put(K.snap, null); put(K.out, null); S.key = null; msg('אין הרשאה במכשיר הזה.<br>פנה לרבש"ץ לקבלת קישור הפעלה.'); return; }
 if (!r.ok) { if (!quiet) toast(esc(r.msg || 'שגיאה בסנכרון')); return; }
@@ -133,6 +138,7 @@ else if (lost) toast(lost === 1 ? 'עדכון אחד לא נשמר: המשימה
 S.offset = r.serverTime - Date.now(); put(K.off, String(S.offset));
 r.syncedAt = Date.now();
 delete r.results;
+if (!r.info && S.snap && S.snap.info && r.ih === S.snap.ih) r.info = S.snap.info;
 S.snap = r; saveSnap();
 applyOutbox();
 render();
@@ -222,11 +228,12 @@ $('undoBtn').onclick = doUndo;
 function render() {
 netUI();
 if (!S.snap) return;
+if (S.page) return renderInfo();
 if (!S.proc) return renderHome();
 renderProc();
 }
 
-function home() { hideUndo(); S.proc = null; S.domain = null; window.scrollTo(0, 0); render(); }
+function home() { hideUndo(); S.page = null; S.proc = null; S.domain = null; window.scrollTo(0, 0); render(); }
 
 // חיפוש: כל מילה שהוקלדה צריכה להופיע בשם הסד"פ (בלי תלות בגרשיים)
 function norm(s) { return String(s || '').replace(/["'׳״]/g, '').replace(/[ךםןףץ]/g, function (c) { return { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' }[c]; }).toLowerCase(); }
@@ -260,10 +267,15 @@ h += '<button class="proc" data-p="' + esc(p) + '">' + esc(p) + (started ? '<sma
 });
 var hits = S.q ? contentHits() : [];
 if (S.q && h) h = '<div class="sec">סד"פים</div>' + h;
+var infos = (S.snap.info || []).filter(function (x) { return matchQ(x.name); });
+if (infos.length) {
+h += '<div class="sec">דפי מידע</div>';
+infos.forEach(function (x) { h += '<button class="info" data-i="' + esc(x.name) + '">ℹ️ ' + esc(x.name) + '</button>'; });
+}
 if (hits.length) {
 h += '<div class="sec">נמצא בתוכן הסד"פים (' + hits.length + ')</div>';
 hits.forEach(function (x) {
-h += '<button class="hit" data-p="' + esc(x.p) + '" data-d="' + esc(x.d || '') + '" data-s="' + (x.s || '') + '"><span class="w">' + esc(x.p) + ' · ' + esc(x.w) + '</span>' + mark(x.t) + '</button>';
+h += '<button class="hit" data-p="' + esc(x.p) + '" data-d="' + esc(x.d || '') + '" data-s="' + (x.s || '') + '" data-ip="' + esc(x.ip || '') + '" data-ir="' + (x.ir == null ? '' : x.ir) + '"><span class="w">' + esc(x.p) + ' · ' + esc(x.w) + '</span>' + mark(x.t) + '</button>';
 });
 }
 $('main').innerHTML = h || '<div class="msg">' + (S.q ? 'לא נמצא סד"פ או תוכן עם "' + esc(S.q) + '".' : 'אין סד"פים להצגה.') + '</div>';
@@ -271,7 +283,14 @@ Array.prototype.forEach.call(document.querySelectorAll('.proc'), function (b) {
 b.onclick = function () { S.proc = b.getAttribute('data-p'); S.domain = null; window.scrollTo(0, 0); render(); };
 });
 Array.prototype.forEach.call(document.querySelectorAll('.hit'), function (b) {
-b.onclick = function () { S.proc = b.getAttribute('data-p'); S.domain = b.getAttribute('data-d') || null; S.focus = b.getAttribute('data-s') || null; window.scrollTo(0, 0); render(); };
+b.onclick = function () {
+var ip = b.getAttribute('data-ip');
+if (ip) { S.page = ip; S.ifocus = b.getAttribute('data-ir'); window.scrollTo(0, 0); render(); return; }
+S.proc = b.getAttribute('data-p'); S.domain = b.getAttribute('data-d') || null; S.focus = b.getAttribute('data-s') || null; window.scrollTo(0, 0); render();
+};
+});
+Array.prototype.forEach.call(document.querySelectorAll('.info'), function (b) {
+b.onclick = function () { S.page = b.getAttribute('data-i'); S.ifocus = null; window.scrollTo(0, 0); render(); };
 });
 }
 
@@ -291,7 +310,26 @@ if (ok(t.text)) out.push({ p: p, d: d, s: t.serial, w: d + ' · משימה ' + t
 });
 });
 });
+(S.snap.info || []).forEach(function (pg) {
+pg.rows.forEach(function (r, i) { var t = r.join(' · '); if (ok(t)) out.push({ p: pg.name, ip: pg.name, ir: i, w: 'דף מידע', t: t }); });
+});
 return out;
+}
+// דף מידע (קריאה בלבד)
+function linkify(s) {
+return esc(s).replace(/\n/g, '<br>').replace(/(^|[^\d])(0\d{1,2}-?\d{3}-?\d{4}|\*\d{3,5})(?!\d)/g, function (m, pre, num) { return pre + '<a href="tel:' + num.replace(/-/g, '') + '">' + num + '</a>'; });
+}
+function renderInfo() {
+$('back').style.display = 'inline-block';
+$('title').textContent = S.page;
+$('tabs').innerHTML = '';
+var pg = null;
+(S.snap.info || []).forEach(function (x) { if (x.name === S.page) pg = x; });
+if (!pg) { msg('הדף לא נמצא.'); return; }
+var h = '';
+pg.rows.forEach(function (r, i) { h += '<div class="irow" id="ir' + i + '">' + r.map(function (c) { return '<span class="ic">' + linkify(c) + '</span>'; }).join('') + '</div>'; });
+$('main').innerHTML = h || '<div class="msg">הדף ריק.</div>';
+if (S.ifocus != null && S.ifocus !== '') { var fe = $('ir' + S.ifocus); S.ifocus = null; if (fe) { fe.scrollIntoView({ block: 'center' }); fe.style.boxShadow = '0 0 0 3px #1565c0'; } }
 }
 function mark(s) {
 var h = esc(s);

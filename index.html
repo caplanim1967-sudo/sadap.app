@@ -102,9 +102,15 @@ function feat(proc) { return !!(S.snap && S.snap.feat && S.snap.feat.indexOf(pro
 function isIOS() { return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
 function isStandalone() { return window.navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches); }
 
+// בקשה שלא נענתה תוך 20 שניות מבוטלת, והעדכון יישלח שוב (afterSync). בלי זה, בקשה שנתקעת אצל גוגל
+// משאירה את ה-⏳ עד 6 דקות. אם הבקשה התקועה תסתיים בכל זאת – הגיליון מזהה את אותו עדכון ולא רושם פעמיים.
+var API_TIMEOUT_MS = 20000;
 function api(body) {
-return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
-.then(function (r) { return r.json(); });
+var ctrl = window.AbortController ? new AbortController() : null;
+var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, API_TIMEOUT_MS) : null;
+return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body), signal: ctrl ? ctrl.signal : undefined })
+.then(function (r) { return r.json(); })
+.then(function (j) { clearTimeout(timer); return j; }, function (e) { clearTimeout(timer); throw e; });
 }
 
 // ---------- מצב חיבור ----------

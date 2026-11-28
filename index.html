@@ -118,8 +118,20 @@ if (S.snap && S.snap.syncedAt) { $('bar').style.display = 'block'; $('bar').text
 }
 
 // ---------- סנכרון ----------
+// סימון שנלחץ בזמן שליחה לא מחכה לסבב של דקה: מסמנים "שוב", והוא יוצא מיד כשהשליחה הנוכחית מסתיימת.
+// שליחה שנכשלה (רשת חלשה) – ניסיון חוזר אחרי 5, 10, 20... שניות (עד דקה), כל עוד יש ממתינים.
+function afterSync(ok) {
+if (S.again) { S.again = false; setTimeout(function () { sync(true); }, 0); return; }
+if (ok) { S.retry = 0; return; }
+if (S.out.length && navigator.onLine) {
+var wait = Math.min(60000, 5000 * Math.pow(2, S.retry || 0));
+S.retry = (S.retry || 0) + 1;
+clearTimeout(S.retryH); S.retryH = setTimeout(function () { sync(true); }, wait);
+}
+}
 function sync(quiet) {
-if (!S.key || S.syncing) return Promise.resolve();
+if (!S.key) return Promise.resolve();
+if (S.syncing) { S.again = true; return Promise.resolve(); }
 if (!navigator.onLine) { netUI(); return Promise.resolve(); }
 S.syncing = true;
 var sent = S.out.slice();
@@ -128,7 +140,7 @@ var wire = sent.map(function (u) { return { id: u.id, proc: u.proc, domain: u.do
 return api({ action: 'sync', key: S.key, updates: wire, ih: (S.snap && S.snap.info) ? S.snap.ih : '' }).then(function (r) {
 S.syncing = false; S.inflight = {};
 if (r.noauth) { put(K.key, null); put(K.snap, null); put(K.out, null); S.key = null; msg('אין הרשאה במכשיר הזה.<br>פנה לרבש"ץ לקבלת קישור הפעלה.'); return; }
-if (!r.ok) { if (!quiet) toast(esc(r.msg || 'שגיאה בסנכרון')); return; }
+if (!r.ok) { if (!quiet) toast(esc(r.msg || 'שגיאה בסנכרון')); afterSync(false); return; }
 var done = {}, lost = 0, undoLost = 0;
 (r.results || []).forEach(function (x) { done[x.id] = true; if (!x.ok) { if (x.why === 'changed') undoLost++; else lost++; } });
 S.out = S.out.filter(function (u) { return !done[u.id]; });
@@ -142,8 +154,10 @@ if (!r.info && S.snap && S.snap.info && r.ih === S.snap.ih) r.info = S.snap.info
 S.snap = r; saveSnap();
 applyOutbox();
 render();
+afterSync(true);
 }).catch(function () {
 S.syncing = false; S.inflight = {}; netUI();
+afterSync(false);
 });
 }
 
